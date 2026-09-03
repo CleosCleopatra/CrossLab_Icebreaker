@@ -296,10 +296,7 @@ async function readyToReveal(){
   const answers=window.currentAnswers||{};
   const required = requiredGroups(q);
   const groupsPresent = required.every(g => Object.values(answers).some(a=>a.group===g));
-  if(!groupsPresent){
-    alert("Not everyone in the required group(s) has answered yet.");
-    return;
-  }
+
   await update(dbSession(),{revealed:true});
 }
 
