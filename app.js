@@ -86,8 +86,8 @@ const QUESTIONS = [
   {
     id:"q5",
     type:"cultural",
-    title:"When do people normally eat dinner?",
-    options:["4–5 PM","5–6 PM","6–7 PM","7–8 PM","8–9 PM","9–10 PM"]
+    title:"If you and a friend have decided to meet up at 18:01, when would you be there?",
+    options:["before 17:30","17:30-18:00","18:00 - 18:15","18:15-18:30","18:30 - 19:00","after 19:00"]
   }
 ];
 
@@ -229,6 +229,7 @@ function renderStandard(q, answers, revealed, active){
   const activeGroups = q.activeGroups || {};
   const answer = answers[uid]?.answer ?? null;
   const halves = isTwo ? ["Sweden","Rwanda"] : [target];
+  const canTriggerReveal = !revealed && (q.type === "signle" || acctive);
 
   $("app").innerHTML = `<div class="screen"><div class="question-layout">
     ${topbar()}
@@ -240,7 +241,7 @@ function renderStandard(q, answers, revealed, active){
         return halfHtml(q,country,enabled,answer,revealed,answers);
       }).join("")}
     </div>
-    const canTriggerReveal = !revealed && (q.type === "signle" || acctive);
+
     <div class="next-row">
       ${!revealed && active ? `<button class="primary" id="submitBtn">${answer ? "Change answer" : "Submit answer"}</button>` : ""}
       ${!canTriggerReveal ? `<button class="secondary" id="readyBtn">Everyone has answered</button>` : ""}
