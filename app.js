@@ -108,6 +108,7 @@ const esc = s => String(s).replace(/[&<>"']/g, c => ({
   "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
 }[c]));
 
+
 function dbSession(){ return ref(db,"crosslab/session"); }
 function dbAnswers(qid){ return ref(db,`crosslab/answers/${qid}`); }
 
@@ -511,8 +512,15 @@ function renderHost(){
 }
 
 async function resetSession(){
-  await remove(ref(db,"crosslab/answers"));
-  await set(dbSession(),{questionId:QUESTIONS[0].id,phase:QUESTIONS[0].type==="cultural"?"own":"answer",revealed:false});
+  for (const q of QUESTIONS){
+    await remove(ref(db, "crosslab/answers/${q.id}"));
+  }
+  
+  await update(dbSession(),{
+    questionId:QUESTIONS[0].id,
+    phase:QUESTIONS[0].type === "cultural"?"own":"answer",
+    revealed:false
+  });
 }
 
 window.addEventListener("hashchange",render);
