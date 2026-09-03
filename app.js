@@ -240,9 +240,10 @@ function renderStandard(q, answers, revealed, active){
         return halfHtml(q,country,enabled,answer,revealed,answers);
       }).join("")}
     </div>
+    const canTriggerReveal = !revealed && (q.type === "signle" || acctive);
     <div class="next-row">
       ${!revealed && active ? `<button class="primary" id="submitBtn">${answer ? "Change answer" : "Submit answer"}</button>` : ""}
-      ${!revealed && active ? `<button class="secondary" id="readyBtn">Everyone has answered</button>` : ""}
+      ${!canTriggerReveal ? `<button class="secondary" id="readyBtn">Everyone has answered</button>` : ""}
     </div>
     <div id="revealArea"></div>
     <div class="center-actions">
