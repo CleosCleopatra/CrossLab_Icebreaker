@@ -9,13 +9,13 @@ import {
    Replace these values with your Firebase Web App config.
    ============================================================ */
 const firebaseConfig = {
-  apiKey: "PASTE_YOUR_API_KEY_HERE",
-  authDomain: "PASTE_YOUR_PROJECT.firebaseapp.com",
-  databaseURL: "https://PASTE_YOUR_DATABASE_URL",
-  projectId: "PASTE_YOUR_PROJECT_ID",
-  storageBucket: "PASTE_YOUR_PROJECT.firebasestorage.app",
-  messagingSenderId: "PASTE_YOUR_SENDER_ID",
-  appId: "PASTE_YOUR_APP_ID"
+  apiKey: "AIzaSyC2mB6W7nxSUnGjdB2GEIfZyPNZNDeVpMc",
+  authDomain: "croabfirst.firebaseapp.com",
+  databaseURL: "https://croabfirst-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "croabfirst",
+  storageBucket: "croabfirst.firebasestorage.app",
+  messagingSenderId: "848355538465",
+  appId: "1:848355538465:web:98ef4a1da7aa50a96e9560"
 };
 
 /* ============================================================
