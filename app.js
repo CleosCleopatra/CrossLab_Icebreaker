@@ -496,7 +496,7 @@ function renderHost(){
       <div class="card"><h2>Controls</h2>
         <button class="primary" id="revealHost">Reveal</button>
         <button class="secondary" id="nextHost">Next</button>
-        <button class="danger" id="resetHost">Reset session</button>
+        <button class="danger" id="resetHost">Reset all sessions</button>
       </div>
     </div>
     <div class="card" style="margin-top:18px">
