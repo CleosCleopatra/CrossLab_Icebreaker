@@ -463,12 +463,21 @@ function bar(label,n,total){
 
 async function nextQuestion(){
   const idx=QUESTIONS.findIndex(q=>q.id===session.questionId);
-  const next=QUESTIONS[idx+1];
-  if(!next){
-    await update(dbSession(),{questionId:"",phase:"answer",revealed:false});
+
+  if (idx === -1) {
+    console.warn("Current question not found in QUESTIONS array")
     return;
   }
-  await set(ref(db,"crosslab/answers"),{});
+
+  const next = QUESTIONS[idx + 1];
+
+  if(!next){
+    await update(dbSession(),
+    {questionId:"",
+      phase:"answer",
+      revealed:false});
+    return;
+  }
   await update(dbSession(),{questionId:next.id,phase:next.type==="cultural"?"own":"answer",revealed:false});
 }
 
