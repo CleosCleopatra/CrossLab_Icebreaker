@@ -229,7 +229,7 @@ function renderStandard(q, answers, revealed, active){
   const activeGroups = q.activeGroups || {};
   const answer = answers[uid]?.answer ?? null;
   const halves = isTwo ? ["Sweden","Rwanda"] : [target];
-  const canTriggerReveal = !revealed && (q.type === "signle" || acctive);
+  const canTriggerReveal = !revealed && (q.type === "signle" || active);
 
   $("app").innerHTML = `<div class="screen"><div class="question-layout">
     ${topbar()}
