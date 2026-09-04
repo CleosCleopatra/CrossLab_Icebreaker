@@ -181,8 +181,15 @@ function subscribe(){
 
 function subscribeAnswers(){
   if(stopAnswersListener) stopAnswersListener();
-  if(!session?.questionId) return;
-  stopAnswersListener = onValue(dbAnswers(session.questionId), snap => {
+
+  if(!session || !selectedGroup) return;
+
+  const pairKey = getPairKey(selectedGroup);
+  const pairSession = session.pairs?.[pairKey];
+
+  if(!pairSession?.questionId) return;
+
+  stopAnswersListener = onValue(dbAnswers(pairSession.questionId), snap => {
     window.currentAnswers = snap.val() || {};
     render();
   });
@@ -249,9 +256,17 @@ function renderStudent(){
 }
 
 function topbar(){
+  const pairKey = getPairKey(selectedGroup);
+  const pairSession = session?.pairs?.[pairKey] || {};
+
   return `<div class="topbar">
-    <div><span class="logo">CrossLab</span> · ${esc(selectedGroup)} · partner: ${esc(PARTNER[selectedGroup])}</div>
-    <span class="status">${session?.revealed ? "Answers revealed" : "Live"}</span>
+    <div>
+      <span class="logo">CrossLab</span> · 
+      ${esc(selectedGroup)} · 
+      partner: ${esc(PARTNER[selectedGroup])}
+      </div>
+    <span class="status">
+    ${pairSession?.revealed ? "Answers revealed" : "Live"}</span>
   </div>`;
 }
 
@@ -516,7 +531,7 @@ function bar(label,n,total){
 async function nextQuestion(){
   const pairKey = getPairKey(selectedGroup);
   const pairSession = session.pairs?.[pairKey];
-  const idx=QUESTIONS.findIndex(q=>q.id===session.questionId);
+  const idx=QUESTIONS.findIndex(q=>q.id===pairSession.questionId);
 
   if (idx === -1) {
     console.warn("Current question not found in QUESTIONS array")
@@ -628,9 +643,23 @@ async function resetSession(){
   }
   
   await update(dbSession(),{
-    questionId:QUESTIONS[0].id,
-    phase:QUESTIONS[0].type === "cultural"?"own":"answer",
-    revealed:false
+    pairs: {
+      "Rwa1-Swe1": {
+        questionId: QUESTIONS[0].id,
+        phase: QUESTIONS[0].type === "cultural" ? "own" : "answer",
+        revealed: false
+      },
+      "Rwa2-Swe2": {
+        questionId: QUESTIONS[0].id,
+        phase: QUESTIONS[0].type === "cultural" ? "own" : "answer",
+        revealed: false
+      },
+      "Rwa3-Swe3": {
+        questionId: QUESTIONS[0].id,
+        phase: QUESTIONS[0].type === "cultural" ? "own" : "answer",
+        revealed: false
+      }
+    }
   });
 }
 
