@@ -230,7 +230,7 @@ function renderStandard(q, answers, revealed, active){
   const activeGroups = q.activeGroups || {};
   const answer = answers[uid]?.answer ?? null;
   const halves = isTwo ? ["Sweden","Rwanda"] : [target];
-  const canTriggerReveal = !revealed && (q.type === "signle" || active);
+  const canTriggerReveal = !revealed && (q.type === "single" || active);
 
   $("app").innerHTML = `<div class="screen"><div class="question-layout">
     ${topbar()}
@@ -245,7 +245,7 @@ function renderStandard(q, answers, revealed, active){
 
     <div class="next-row">
       ${!revealed && active ? `<button class="primary" id="submitBtn">${answer ? "Change answer" : "Submit answer"}</button>` : ""}
-      ${!canTriggerReveal ? `<button class="secondary" id="readyBtn">Everyone has answered</button>` : ""}
+      ${canTriggerReveal ? `<button class="secondary" id="readyBtn">Everyone has answered</button>` : ""}
     </div>
     <div id="revealArea"></div>
     <div class="center-actions">
@@ -515,7 +515,7 @@ async function resetSession(){
   if(!confirm("Are you sure you want to reset the entire session for all groups?")){
     return;
   }
-  
+
   for (const q of QUESTIONS){
     await remove(ref(db, `crosslab/answers/${q.id}`));
   }
