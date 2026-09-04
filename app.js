@@ -108,6 +108,10 @@ const esc = s => String(s).replace(/[&<>"']/g, c => ({
   "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
 }[c]));
 
+function getPairKey(group){
+  const partner = PARTNER[group];
+  return [group, partnet].sort().goin("-");
+}
 
 function dbSession(){ return ref(db,"crosslab/session"); }
 function dbAnswers(qid){ return ref(db,`crosslab/answers/${qid}`); }
@@ -122,7 +126,10 @@ function targetFor(q, group){
 }
 
 function currentQuestion(){
-  return QUESTIONS.find(q => q.id === session?.questionId) || QUESTIONS[0];
+  if(!session || !selectedGroup) return QUESTIONS[0];
+  const pairKey = getPairKey(selectedGroup);
+  const pairSession = session.pairs?.[pairKey];
+  return QUESTIONS.find(q => q.id === pairSession?.questionId) || QUESTIONS[0];
 }
 
 async function resetPartnerGroup(){
@@ -229,8 +236,10 @@ function renderStudent(){
   const q = currentQuestion();
   const active = activeForQuestion(q, selectedGroup);
   const answers = window.currentAnswers || {};
-  const revealed = !!session.revealed;
-  const phase = session.phase || "answer";
+  const pairKey = getPairKey(selectedGroup);
+  const pairSession = session?.pairs?.[pairKey] || {};
+  const revealed = !!pairSession.revealed;
+  const phase = pairSession.phase || "answer";
 
   if(q.type === "cultural"){
     renderCultural(q, answers, revealed, phase);
@@ -322,7 +331,13 @@ async function readyToReveal(){
   const required = requiredGroups(q);
   const groupsPresent = required.every(g => Object.values(answers).some(a=>a.group===g));
 
-  await update(dbSession(),{revealed:true});
+  if(!groupsPresent){
+    alert("Not everyone in the required group(s) has answered yet.");
+    return;
+  }
+
+  const pairKey = getPairKey(selectedGroup);
+  await update(ref(db, `crosslab/session/pairs/${pairKey}`), {revealed:true});
 }
 
 function requiredGroups(q){
@@ -437,7 +452,11 @@ async function submitCultural(){
   const q=currentQuestion();
   const value=window.pendingCultural ?? null;
   if(!value){alert("Choose an answer first.");return;}
-  const field=session.phase==="other" ? "guess" : "own";
+
+  const pairKey = getPairKey(selectedGroup);
+  const pairSession = session.pairs?.[pairKey];
+  const field = pairSession?.phase === "other" ? "guess" : "own";
+
   await update(ref(db,`crosslab/answers/${q.id}/${uid}`),{
     [field]:value,
     group:selectedGroup,
@@ -449,16 +468,27 @@ async function submitCultural(){
 }
 
 async function readyCultural(){
-  const q=currentQuestion(), answers=window.currentAnswers||{};
+  const q=currentQuestion(); 
+  const answers=window.currentAnswers||{};
   const required=GROUPS;
+  const pairKey = getPairKey(selectedGroup);
+  const pairSession = session.pairs?.[pairKey];
+
   const allOwn=required.every(g=>Object.values(answers).some(a=>a.group===g && a.own));
-  if(session.phase!=="other"){
-    if(!allOwn){alert("Everyone needs to answer for their own country first.");return;}
-    await update(dbSession(),{phase:"other"});
+
+  if(pairSession?.phase!=="other"){
+    if(!allOwn){
+      alert("Everyone needs to answer for their own country first.");
+      return;
+    }
+    await update(ref(db, `crosslab/session/pairs/${pairKey}`), {phase: "other"});
   }else{
     const allGuess=required.every(g=>Object.values(answers).some(a=>a.group===g && a.guess));
-    if(!allGuess){alert("Everyone needs to guess the other country first.");return;}
-    await update(dbSession(),{revealed:true});
+    if(!allGuess){
+      alert("Everyone needs to guess the other country first.");
+      return;
+    }
+    await update(ref(db, `crosslab/session/pairs/${pairKey}`), {revealed: true});
   }
 }
 
@@ -484,6 +514,8 @@ function bar(label,n,total){
 }
 
 async function nextQuestion(){
+  const pairKey = getPairKey(selectedGroup);
+  const pairSession = session.pairs?.[pairKey];
   const idx=QUESTIONS.findIndex(q=>q.id===session.questionId);
 
   if (idx === -1) {
@@ -494,44 +526,97 @@ async function nextQuestion(){
   const next = QUESTIONS[idx + 1];
 
   if(!next){
-    await update(dbSession(),
-    {questionId:"",
-      phase:"answer",
-      revealed:false});
+    await update(ref(db, `crosslab/session/pairs/${pairKey}`), {
+      questionId: "",
+      phase: "answer",
+      revealed: false
+    });
     return;
   }
-  await update(dbSession(),{questionId:next.id,phase:next.type==="cultural"?"own":"answer",revealed:false});
+  await update(ref(db, `crosslab/session/pairs/${pairKey}`), {
+    questionId: next.id,
+    phase: next.type === "cultural" ? "own" : "answer",
+    revealed: false
+  });
 }
 
+
+
 function renderHost(){
-  const q=currentQuestion();
-  const answers=window.currentAnswers||{};
   $("app").innerHTML=`<div class="screen"><div class="question-layout">
     <div class="topbar"><div><span class="logo">CrossLab Host</span></div><a href="#" id="studentView">Student view</a></div>
     <div class="host-grid">
-      <div class="card"><h2>Session</h2>
-        <p><strong>Question:</strong> ${q?.title?esc(q.title):"None"}</p>
-        <p><strong>Phase:</strong> ${esc(session?.phase||"—")}</p>
-        <p><strong>Revealed:</strong> ${session?.revealed?"Yes":"No"}</p>
-        <p><strong>Responses:</strong> ${Object.keys(answers).length}</p>
-      </div>
-      <div class="card"><h2>Controls</h2>
-        <button class="primary" id="revealHost">Reveal</button>
-        <button class="secondary" id="nextHost">Next</button>
-        <button class="danger" id="resetHost">Reset sessions</button>
-      </div>
+      ${["Rwa1-Swe1", "Rwa2-Swe2", "Rwa3-Swe3"].map(pairKey => {
+        const pairSession = session?.pairs?.[pairKey] || {};
+        const q = QUESTIONS.find(q => q.id === pairSession.questionId) || QUESTIONS[0];
+        return `<div class="card">
+          <h2>${pairKey}</h2>
+          <p><strong>Question:</strong> ${q?.title || "None"}</p>
+          <p><strong>Phase:</strong> ${pairSession.phase || "—"}</p>
+          <p><strong>Revealed:</strong> ${pairSession.revealed ? "Yes" : "No"}</p>
+          <button class="secondary" onclick="revealPair('${pairKey}')">Reveal</button>
+          <button class="secondary" onclick="nextPair('${pairKey}')">Next</button>
+          <button class="danger" onclick="resetPair('${pairKey}')">Reset</button>
+        </div>`;
+      }).join("")}
     </div>
-    <div class="card" style="margin-top:18px">
-      <h2>Questions in code</h2>
-      <p class="muted">Edit the QUESTIONS array in app.js to add or change questions.</p>
-      <pre style="white-space:pre-wrap;overflow:auto">${esc(JSON.stringify(QUESTIONS,null,2))}</pre>
+    <div class="card"><h2>Controls</h2>
+      <button class="danger" id="resetHost">Reset all</button>
     </div>
   </div></div>`;
+  
   $("studentView").onclick=e=>{e.preventDefault();location.hash="";render();};
-  $("revealHost").onclick=()=>update(dbSession(),{revealed:true});
-  $("nextHost").onclick=nextQuestion;
   $("resetHost").onclick=resetSession;
 }
+
+async function revealPair(pairKey){
+  await update(ref(db, `crosslab/session/pairs/${pairKey}`), {revealed: true});
+}
+
+async function nextPair(pairKey){
+  const pairSession = session?.pairs?.[pairKey];
+  const idx = QUESTIONS.findIndex(q => q.id === pairSession?.questionId);
+  const next = QUESTIONS[idx + 1];
+  
+  if(!next){
+    await update(ref(db, `crosslab/session/pairs/${pairKey}`), {
+      questionId: "",
+      phase: "answer",
+      revealed: false
+    });
+    return;
+  }
+  
+  await update(ref(db, `crosslab/session/pairs/${pairKey}`), {
+    questionId: next.id,
+    phase: next.type === "cultural" ? "own" : "answer",
+    revealed: false
+  });
+}
+
+async function resetPair(pairKey){
+  if(!confirm(`Reset ${pairKey}?`)) return;
+  
+  for(const q of QUESTIONS){
+    const answers = window.currentAnswers || {};
+    const groups = pairKey.split("-");
+    const entriesToDelete = Object.entries(answers).filter(([uid, answer]) => {
+      return groups.includes(answer.group);
+    });
+    
+    for(const [uid, _] of entriesToDelete){
+      await remove(ref(db, `crosslab/answers/${q.id}/${uid}`));
+    }
+  }
+  
+  await update(ref(db, `crosslab/session/pairs/${pairKey}`), {
+    questionId: QUESTIONS[0].id,
+    phase: "answer",
+    revealed: false
+  });
+}
+
+
 
 async function resetSession(){
   if(!confirm("Are you sure you want to reset the entire session for all groups?")){
@@ -560,9 +645,11 @@ async function boot(){
       const snap=await get(dbSession());
       if(!snap.exists()){
         await set(dbSession(),{
-          questionId:QUESTIONS[0].id,
-          phase:QUESTIONS[0].type==="cultural"?"own":"answer",
-          revealed:false
+          pairs: {
+            "Rwa1-Swe1":{questionId: QUESTIONS[0].id, phase: "answer", revealed: false},
+            "Rwa2-Swe2": {questionId: QUESTIONS[0].id, phase: "answer", revealed: false},
+            "Rwa3-Swe3": {questionId: QUESTIONS[0].id, phase: "answer", revealed: false}
+          }
         });
       }
     }
