@@ -513,7 +513,7 @@ function renderHost(){
 
 async function resetSession(){
   for (const q of QUESTIONS){
-    await remove(ref(db, "crosslab/answers/${q.id}"));
+    await remove(ref(db, `crosslab/answers/${q.id}`));
   }
   
   await update(dbSession(),{
