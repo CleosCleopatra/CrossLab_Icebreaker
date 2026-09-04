@@ -512,6 +512,10 @@ function renderHost(){
 }
 
 async function resetSession(){
+  if(!confirm("Are you sure you want to reset the entire session for all groups?")){
+    return;
+  }
+  
   for (const q of QUESTIONS){
     await remove(ref(db, `crosslab/answers/${q.id}`));
   }
