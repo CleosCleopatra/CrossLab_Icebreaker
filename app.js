@@ -110,7 +110,7 @@ const esc = s => String(s).replace(/[&<>"']/g, c => ({
 
 function getPairKey(group){
   const partner = PARTNER[group];
-  return [group, partner].sort().goin("-");
+  return [group, partner].sort().join("-");
 }
 
 function dbSession(){ return ref(db,"crosslab/session"); }
