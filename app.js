@@ -125,6 +125,28 @@ function currentQuestion(){
   return QUESTIONS.find(q => q.id === session?.questionId) || QUESTIONS[0];
 }
 
+async function resetPartnerGroup(){
+  if(!confirm(`Are you sure you want to reset the session for ${selectedGroup} and ${PARTNER[selectedGroup]}?\n\nOther groups will not be affected.`)){
+    return;
+  }
+
+  const partnerGroup = PARTNER[selectedGroup];
+
+  for (const q of QUESTIONS){
+    const answers = window.currentAnswers || {};
+    const entriesToDelete = Object.entries(answers).filter(([uid, answer]) => {
+      return answer.group === selectedGroup || answer.group === partnerGroup;
+    });
+
+    for (const [uid, _] of entriesToDelete){
+      await remove(ref(db, `crosslab/answers/${q.id}/${uid}`));
+    }
+  }
+
+  alert(`Reset complete for ${selectedGroup} and @{PARTNER[selectedGroup]}`);
+  render();
+}
+
 async function ensureAuth(){
   if(firebaseConfig.apiKey.startsWith("PASTE_")){
     renderError("Firebase is not configured yet. Open app.js and paste your Firebase Web App configuration.");
