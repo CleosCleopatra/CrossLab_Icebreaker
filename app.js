@@ -368,10 +368,6 @@ async function readyToReveal(){
   const required = requiredGroups(q);
   const groupsPresent = required.every(g => Object.values(answers).some(a=>a.group===g));
 
-  if(!groupsPresent){
-    alert("Not everyone in the required group(s) has answered yet.");
-    return;
-  }
 
   const pairKey = getPairKey(selectedGroup);
   await update(ref(db, `crosslab/session/pairs/${pairKey}`), {revealed:true});
