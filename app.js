@@ -180,7 +180,10 @@ function subscribe(){
 }
 
 function subscribeAnswers(){
-  if(stopAnswersListener) stopAnswersListener();
+  if(stopAnswersListener){
+    stopAnswersListener();
+    stopAnswersListener  = null;
+  }
 
   if(!session || !selectedGroup) return;
 
@@ -189,7 +192,12 @@ function subscribeAnswers(){
 
   if(!pairSession?.questionId) return;
 
-  stopAnswersListener = onValue(dbAnswers(pairSession.questionId), snap => {
+  const qid = pairSession.questionId;
+
+  window.currentAnswers = {};
+
+  stopAnswersListener = onValue(
+    dbAnswers(qid), snap => {
     window.currentAnswers = snap.val() || {};
     render();
   });
@@ -329,15 +337,29 @@ async function submitStandard(){
   const q=currentQuestion();
   const answer = window.pendingAnswer ?? window.currentAnswers?.[uid]?.answer;
   if(!answer){ alert("Choose an answer first."); return; }
-  await set(ref(db,`crosslab/answers/${q.id}/${uid}`),{
-    answer,
-    group:selectedGroup,
-    country:COUNTRY(selectedGroup),
-    target:q.type==="countryGuess" ? targetFor(q,selectedGroup) : targetFor(q,selectedGroup),
-    submittedAt:Date.now()
-  });
-  window.pendingAnswer=null;
-  render();
+  
+  const answerData = {
+    answer: answer,
+    group: selectedGroup,
+    country: COUNTRY(selectedGroup),
+    target: targetFor(q, selectedGroup),
+    submittedAt: Date.now()
+  };
+  try{
+  await set(ref(db,`crosslab/answers/${q.id}/${uid}`),
+    answerData);
+
+    window.currentAnswers = {
+      ...(window.currentAnswers || {}),
+      [uid]: answerData
+    };
+    
+    window.pendingAnswer=null;
+    render();
+} catch(e) {
+  console.error("Failed to submit answer: ", e);
+  alert("Could not save your answer: " + e.message)
+}
 }
 
 async function readyToReveal(){
@@ -472,14 +494,21 @@ async function submitCultural(){
   const pairSession = session.pairs?.[pairKey];
   const field = pairSession?.phase === "other" ? "guess" : "own";
 
-  await update(ref(db,`crosslab/answers/${q.id}/${uid}`),{
+  try{
+    await update(ref(db,`crosslab/answers/${q.id}/${uid}`),{
     [field]:value,
     group:selectedGroup,
     country:COUNTRY(selectedGroup),
     submittedAt:Date.now()
   });
-  window.pendingCultural=null;
+
+  window.pendingCultural = null;
+
   render();
+  }catch(e) {
+    console.error("Failed to submit cultural answer:", e);
+    alert("Could not save your answer: " + e.message);
+  }
 }
 
 async function readyCultural(){
