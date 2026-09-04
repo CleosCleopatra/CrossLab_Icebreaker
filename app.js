@@ -70,7 +70,9 @@ const QUESTIONS = [
     options:["8","12","15","18","21","24"],
     correct:{Sweden:"18"},
     activeGroups:{
-      Swe2:"Sweden"
+      Swe1: "Sweden",
+      Swe2:"Sweden",
+      Swe3: "Sweden"
     }
   },
   {
@@ -80,7 +82,9 @@ const QUESTIONS = [
     options:["35%","50%","65%","75%","85%","95%"],
     correct:{Rwanda:"85%"},
     activeGroups:{
-      Rwa2:"Rwanda"
+      Rwa1:"Rwanda",
+      Rwa2:"Rwanda",
+      Rwa3:"Rwanda"
     }
   },
   {
@@ -365,11 +369,15 @@ async function submitStandard(){
 async function readyToReveal(){
   const q=currentQuestion();
   const answers=window.currentAnswers||{};
-  const required = requiredGroups(q);
+  const pairKey = getPairKey(selectedGroup);
+
+  const required = pairKey
+    .split("-")
+    .filter(g => activeForQuestion(q,g));
+  
   const groupsPresent = required.every(g => Object.values(answers).some(a=>a.group===g));
 
 
-  const pairKey = getPairKey(selectedGroup);
   await update(ref(db, `crosslab/session/pairs/${pairKey}`), {revealed:true});
 }
 
