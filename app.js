@@ -636,24 +636,41 @@ async function nextPair(pairKey){
 
 async function resetPair(pairKey){
   if(!confirm(`Reset ${pairKey}?`)) return;
-  
-  for(const q of QUESTIONS){
-    const answers = window.currentAnswers || {};
+
+  try{
     const groups = pairKey.split("-");
-    const entriesToDelete = Object.entries(answers).filter(([uid, answer]) => {
-      return groups.includes(answer.group);
-    });
-    
-    for(const [uid, _] of entriesToDelete){
-      await remove(ref(db, `crosslab/answers/${q.id}/${uid}`));
+
+    for(const q of QUESTIONS){
+      const snap = await get(dbAnswers(q.id));
+      const answers = snap.val() || {};
+
+      for(const [answerUid, answer] of Object.entries(answers)){
+        if(groups.include(answer.group)){
+          await remove(
+            ref(db, `crosslab/answers/${q.id}/${answerUid}`)
+          );
+        }
+      }
     }
-  }
   
-  await update(ref(db, `crosslab/session/pairs/${pairKey}`), {
-    questionId: QUESTIONS[0].id,
-    phase: "answer",
-    revealed: false
-  });
+  await set(
+    ref(db, `crosslab/session/pairs/${pairKey}`),
+    {
+      questionId: QUESTIONS[0].id,
+      phase: "answer",
+      revealed: false
+    }
+  );
+
+  window.currentAnswers = {};
+  window.pendingAnswer = null;
+  window.pendingCultural = null;
+
+  console.log(`${pairKey} reset to q1`);
+} catch(e){
+  console.error("Reset failed: ", e);
+  alert("Could not reset " + pairKey + ": " + e.message);
+}
 }
 
 
@@ -663,29 +680,39 @@ async function resetSession(){
     return;
   }
 
-  for (const q of QUESTIONS){
-    await remove(ref(db, `crosslab/answers/${q.id}`));
-  }
-  
-  await update(dbSession(),{
-    pairs: {
-      "Rwa1-Swe1": {
-        questionId: QUESTIONS[0].id,
-        phase: QUESTIONS[0].type === "cultural" ? "own" : "answer",
-        revealed: false
-      },
-      "Rwa2-Swe2": {
-        questionId: QUESTIONS[0].id,
-        phase: QUESTIONS[0].type === "cultural" ? "own" : "answer",
-        revealed: false
-      },
-      "Rwa3-Swe3": {
-        questionId: QUESTIONS[0].id,
-        phase: QUESTIONS[0].type === "cultural" ? "own" : "answer",
-        revealed: false
-      }
+  try{
+    for (const q of QUESTIONS){
+      await remove(ref(db, `crosslab/answers/${q.id}`));
     }
-  });
+    await set(dbSession(), {
+      pairs: {
+        "Rwa1-Swe1": {
+          questionId: "q1",
+          phase: "answer",
+          revealed: false
+        },
+        "Rwa2-Swe2": {
+          questionId: "q1",
+          phase: "answer",
+          revealed: false
+        },
+        "Rwa3-Swe3": {
+          questionId: "q1",
+          phase: "answer",
+          revealed: false
+        }
+      }
+    });
+    
+    window.currentAnswers = {};
+    window.pendingAnswer = null;
+    window.pendingCultural = null;
+
+    console.log("Entire session reset to q1");
+  } catch(e) {
+    console.error("Reset fialed: ", e);
+    alert("Could not reset session: " + e.message);
+  }
 }
 
 window.addEventListener("hashchange",render);
