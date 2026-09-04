@@ -70,9 +70,9 @@ const QUESTIONS = [
     options:["8","12","15","18","21","24"],
     correct:{Sweden:"18"},
     activeGroups:{
-      Swe1: "Sweden",
-      Swe2:"Sweden",
-      Swe3: "Sweden"
+      Rwa1: "Rwanda",
+      Rwa2:"Rwanda",
+      Rwa3: "Rwanda"
     }
   },
   {
@@ -82,9 +82,9 @@ const QUESTIONS = [
     options:["35%","50%","65%","75%","85%","95%"],
     correct:{Rwanda:"85%"},
     activeGroups:{
-      Rwa1:"Rwanda",
-      Rwa2:"Rwanda",
-      Rwa3:"Rwanda"
+      Swe1:"Sweden",
+      Swe2:"Sweden",
+      Swe3:"Sweden"
     }
   },
   {
