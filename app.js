@@ -552,16 +552,19 @@ async function submitCultural(){
   const field = pairSession?.phase === "other" ? "guess" : "own";
 
   try{
-    await update(ref(db,`crosslab/answers/${q.id}/${uid}`),{
-    [field]:value,
-    group:selectedGroup,
-    country:COUNTRY(selectedGroup),
-    submittedAt:Date.now()
-  });
-
-  window.pendingCultural = null;
-
-  render();
+    await set(ref(db,`crosslab/answers/${q.id}/${uid}`),{
+      [field]:value,
+      group:selectedGroup,
+      country:COUNTRY(selectedGroup),
+      submittedAt:Date.now()
+    });
+    window.currentCultural = {
+      ...$(window.currentCultural || {}),
+      [uid]: answerData
+    };
+  
+    window.pendingCultural = null;
+    render();
   }catch(e) {
     console.error("Failed to submit cultural answer:", e);
     alert("Could not save your answer: " + e.message);
