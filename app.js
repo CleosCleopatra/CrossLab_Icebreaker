@@ -292,6 +292,29 @@ function renderGroupPicker(){
   });
 }
 
+function renderDone(){
+  $("app").innerHTML = `
+    <div class="screen center">
+      <div class="card narrow center-actions">
+        <div class="logo">CrossLab</div>
+        <h1>Done!</h1>
+        <p class="muted">
+          You have completed all the questions.
+        </p>
+        <button class="primary" id="backToStart">
+          Back to start
+        </button>
+      </div>
+    </div>
+  `;
+
+  $("backToStart").onclick = () => {
+    localStorage.removeItem("crosslabGroup");
+    selectedGroup = null;
+    render();
+  };
+}
+
 function renderWaiting(){
   $("app").innerHTML = `<div class="screen center"><div class="card narrow center-actions">
     <div class="logo">CrossLab</div>
@@ -310,6 +333,12 @@ function renderStudent(){
   const answers = window.currentAnswers || {};
   const pairKey = getPairKey(selectedGroup);
   const pairSession = session?.pairs?.[pairKey] || {};
+
+  if(!pairSession.questionId){
+    renderDone();
+    return;
+  }
+
   const revealed = !!pairSession.revealed;
   const phase = pairSession.phase || "answer";
 
