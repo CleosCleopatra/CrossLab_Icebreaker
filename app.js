@@ -643,17 +643,9 @@ async function readyCultural(){
   const allOwn=required.every(g=>Object.values(answers).some(a=>a.group===g && a.own));
 
   if(pairSession?.phase!=="other"){
-    if(!allOwn){
-      alert("Everyone needs to answer for their own country first.");
-      return;
-    }
     await update(ref(db, `crosslab/session/pairs/${pairKey}`), {phase: "other"});
   }else{
     const allGuess=required.every(g=>Object.values(answers).some(a=>a.group===g && a.guess));
-    if(!allGuess){
-      alert("Everyone needs to guess the other country first.");
-      return;
-    }
     await update(ref(db, `crosslab/session/pairs/${pairKey}`), {revealed: true});
   }
 }
