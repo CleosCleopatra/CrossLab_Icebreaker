@@ -93,9 +93,9 @@ const QUESTIONS = [
     options:["Water bottles","Umbrellas","Coffee","Plastic bags","Sugar","Paper"],
     correct:{Rwanda:"Plastic bags"},
     activeGroups:{
-      Swe1:"Sweden",
-      Swe2:"Sweden",
-      Swe3:"Sweden"
+      Swe1:"Rwanda",
+      Swe2:"Rwanda",
+      Swe3:"Rwanda"
     }
   },
   {
