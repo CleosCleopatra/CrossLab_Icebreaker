@@ -473,7 +473,10 @@ function countAnswers(answers,country,q){
   const counts={};
   q.options.forEach(o=>counts[o]=0);
   Object.values(answers||{}).forEach(a=>{
-    if(a.target===country && q.type==="countryGuess") counts[a.answer]=(counts[a.answer]||0)+1;
+    if(a.target===country && q.type==="countryGuess") 
+      counts[a.answer]=(counts[a.answer]||0)+1;
+    if(a.target===country && q.type === "single")
+      counts[a.answer]=(counts[a.answer]||0)+1;
   });
   return counts;
 }
