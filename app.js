@@ -105,9 +105,9 @@ const QUESTIONS = [
     options:["Swedens national railway","The only chain allowed to sell alcohol in Sweden","Sweden's largest supermarket chain","Swedens national bank","The surname of the Swedish royal family","The capital"],
     correct:{Sweden:"The only chain allowed to sell alcohol in Sweden"},
     activeGroups:{
-      Rwa1:"Rwanda",
-      Rwa2:"Rwanda",
-      Rwa3:"Rwanda"
+      Rwa1:"Sweden",
+      Rwa2:"Sweden",
+      Rwa3:"Sweden"
     }
   },
   {
@@ -117,9 +117,9 @@ const QUESTIONS = [
     options:["Independence day celebration","Monthly community work day","Big cultural festival","Payday","The national exams for high school students","A type of fruit traditionally eaten for breakfast"],
     correct:{Rwanda:"Monthly community work day"},
     activeGroups:{
-      Swe1:"Sweden",
-      Swe2:"Sweden",
-      Swe3:"Sweden"
+      Swe1:"Rwanda",
+      Swe2:"Rwanda",
+      Swe3:"Rwanda"
     }
   },
   {
@@ -129,9 +129,9 @@ const QUESTIONS = [
     options:["Fika: A short break where you drink coffee and sometimes eat a cookie","Lördagsgodis: Saturday candy, only day when children are allowed to eat candy","Fredagsmys: Family stay at home on a Friday to relax and spend time with eachother, usually eating taco","Midsommar: A celebration of summer where people jump around a pole like frogs","Mittiveckan: A weekly tradition of eating seafood with friends","Valborg: A night where big bonfires are light to protect against bad spirits and students party"],
     correct:{Sweden:"Mittiveckan: A weekly tradition of eating seafood with friends"},
     activeGroups:{
-      Rwa1:"Rwanda",
-      Rwa2:"Rwanda",
-      Rwa3:"Rwanda"
+      Rwa1:"Sweden",
+      Rwa2:"Sweden",
+      Rwa3:"Sweden"
     }
   },
   {
