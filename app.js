@@ -309,6 +309,7 @@ function renderDone(){
   `;
 
   $("backToStart").onclick = () => {
+    resetSession;
     localStorage.removeItem("crosslabGroup");
     selectedGroup = null;
     render();
