@@ -589,7 +589,7 @@ function renderCultural(q,answers,revealed,phase){
                 :"Your answer for your own country is already recorded."
             }
           </div>
-        section>
+        </section>
       </div>
       <div class="next-row">
         ${
