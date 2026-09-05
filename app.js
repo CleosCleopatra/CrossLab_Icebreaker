@@ -544,7 +544,7 @@ function renderCultural(q,answers,revealed,phase){
 
 async function submitCultural(){
   const q=currentQuestion();
-  const value=window.pendingCultural ?? null;
+  const value=window.pendingCultural ?? window.currentAnswers?.[uid]?.answer;
   if(!value){alert("Choose an answer first.");return;}
 
   const pairKey = getPairKey(selectedGroup);
