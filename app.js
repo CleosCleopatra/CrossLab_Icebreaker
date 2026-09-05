@@ -485,12 +485,14 @@ function resultBox(q,country,answers){
 function renderCultural(q,answers,revealed,phase){
   const myCountry=COUNTRY(selectedGroup);
   const other=myCountry==="Sweden"?"Rwanda":"Sweden";
+
   const own=answers[uid]?.own ?? null;
   const guess=answers[uid]?.guess ?? null;
 
   if(revealed){
     $("app").innerHTML=`<div class="screen"><div class="question-layout">
-      ${topbar()}<div class="phase-pill">Cultural question · reveal</div>
+      ${topbar()}
+      <div class="phase-pill">Cultural question · reveal</div>
       <h1 class="question-title">${esc(q.title)}</h1>
       <div class="result-columns">
         ${culturalBox(q,"Sweden",answers,"own")}
@@ -501,45 +503,89 @@ function renderCultural(q,answers,revealed,phase){
         ${culturalGuessBox(q,"Sweden",answers,"guess")}
         ${culturalGuessBox(q,"Rwanda",answers,"guess")}
       </div>
-      <div class="next-row"><button class="primary" id="nextBtn">Next question</button></div>
+      <div class="next-row">
+        <button class="primary" id="nextBtn">Next question</button></div>
     </div></div>`;
     $("nextBtn").onclick=nextQuestion;
     return;
   }
 
   const isOwnPhase=phase!=="other";
+
   const prompt=isOwnPhase
     ? `Answer for your own country: ${myCountry}`
     : `Guess what people in ${other} answered`;
 
+  const currentAnswer = isOwnPhase ? own: guess;
+
   $("app").innerHTML=`<div class="screen"><div class="question-layout">
     ${topbar()}
-    <div class="phase-pill">Cultural question · ${isOwnPhase?"1/2":"2/2"}</div>
+    <div class="phase-pill">
+      Cultural question · ${isOwnPhase?"1/2":"2/2"}
+    </div>
+
     <h1 class="question-title">${esc(q.title)}</h1>
-    <div class="notice"><strong>${esc(prompt)}</strong></div>
+
+    <div class="notice">
+      <strong>${esc(prompt)}</strong>
+    </div>
+
     <div class="halves">
       <section class="half">
-        <h3>${isOwnPhase?(myCountry==="Sweden"?"🇸🇪":"🇷🇼"):(other==="Sweden"?"🇸🇪":"🇷🇼")} ${isOwnPhase?myCountry:other}</h3>
-        ${q.options.map(o=>{
-          const selected=isOwnPhase?own:guess;
-          return `<button class="option ${selected===o?"selected":""}" data-cultural="${esc(o)}">${esc(o)}</button>`;
-        }).join("")}
-      </section>
-      <section class="half disabled">
-        <h3>${isOwnPhase?(other==="Sweden"?"🇸🇪":"🇷🇼"):(myCountry==="Sweden"?"🇸🇪":"🇷🇼")} ${isOwnPhase?other:myCountry}</h3>
-        <div class="notice">${isOwnPhase?"You are answering for your own country first.":"Your answer for your own country is already recorded."}</div>
-      </section>
-    </div>
-    <div class="next-row"><button class="primary" id="submitCultural">Submit</button>
-      <button class="secondary" id="readyCultural">Everyone has answered</button></div>
-  </div></div>`;
+        <h3>${
+          isOwnPhase
+            ?(myCountry==="Sweden"?"🇸🇪":"🇷🇼")
+            :(other==="Sweden"?"🇸🇪":"🇷🇼")} 
+          ${isOwnPhase?myCountry:other}</h3>
+        ${q.options.map(o=> `
+          <button
+            class="option ${currentAnswer === o ? "selected" : ""}"
+            data-cultural = "${esc(o)}"
+            ${currentAnswer ? "disabled" : ""}
+          >
+            ${esc(o)}
+          </button>
+          `).join("")}
+        </section>
 
-  document.querySelectorAll("[data-cultural]").forEach(b=>b.onclick=()=>{
-    document.querySelectorAll("[data-cultural]").forEach(x=>x.classList.remove("selected"));
-    b.classList.add("selected"); window.pendingCultural=b.dataset.cultural;
-  });
-  $("submitCultural").onclick=submitCultural;
-  $("readyCultural").onclick=readyCultural;
+        <section class="half disabled">
+          <h3>${isOwnPhase?(other==="Sweden"?"🇸🇪":"🇷🇼"):(myCountry==="Sweden"?"🇸🇪":"🇷🇼")} ${isOwnPhase?other:myCountry}</h3>
+          <div class="notice">
+            ${
+              isOwnPhase
+                ?"You are answering for your own country first."
+                :"Your answer for your own country is already recorded."
+            }
+          </div>
+        section>
+      </div>
+      <div class="next-row">
+        ${
+          !currentAnswer
+            ? `<button class="primary" id="submitCultural">Submit</button>`
+            : ""
+        }
+
+        <button class="secondary" id="readyCultural">Everyone has answered
+        </button>
+      </div>
+    </div></div>`;
+
+  if (!currentAnswer) {
+    document.querySelectorAll("[data-cultural]").forEach(b => {
+      b.onclick = () => {
+        document.querySelectorAll("[data-cultural]")
+          .forEach(x => x.classList.remove("selected"));
+
+        b.classList.add("selected");
+
+        window.pendingCultural = b.dataset.cultural;
+      };
+    });
+  }
+
+  $("submitCultural")?.addEventListener("click", submitCultural);
+  $("readyCultural")?.addEventListener("click", readyCultural);
 }
 
 async function submitCultural(){
@@ -581,7 +627,6 @@ async function submitCultural(){
 
   
     window.pendingCultural = null;
-    render();
   }catch(e) {
     console.error("Failed to submit cultural answer:", e);
     alert("Could not save your answer: " + e.message);
