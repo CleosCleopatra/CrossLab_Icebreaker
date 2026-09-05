@@ -544,24 +544,41 @@ function renderCultural(q,answers,revealed,phase){
 
 async function submitCultural(){
   const q=currentQuestion();
-  const value=window.pendingCultural ?? window.currentAnswers?.[uid]?.answer;
-  if(!value){alert("Choose an answer first.");return;}
 
   const pairKey = getPairKey(selectedGroup);
   const pairSession = session.pairs?.[pairKey];
+
+  if (!pairSession) {
+    alert("Session info is not loaded.");
+    return;
+  }
+
+  const selectedButton = document.querySelector(".option.selected");
+
+  if (!selectedButton) {
+    alert("Choose an answer first.");
+    return;
+  }
+
+  const value= selectedButton.dataset.cultural
+  if(!value){alert("Choose an answer first.");return;}
+
+  
   const field = pairSession?.phase === "other" ? "guess" : "own";
 
   try{
-    await set(ref(db,`crosslab/answers/${q.id}/${uid}`),{
-      [field]:value,
-      group:selectedGroup,
-      country:COUNTRY(selectedGroup),
-      submittedAt:Date.now()
-    });
-    window.currentCultural = {
-      ...$(window.currentCultural || {}),
-      [uid]: answerData
-    };
+    await update(
+      ref(db,`crosslab/answers/${q.id}/${uid}`),
+      {
+        [field]:value,
+        group:selectedGroup,
+        country:COUNTRY(selectedGroup),
+        submittedAt:Date.now()
+      }
+    );
+    
+    console.log(`Saved ${field}:`, value);
+
   
     window.pendingCultural = null;
     render();
