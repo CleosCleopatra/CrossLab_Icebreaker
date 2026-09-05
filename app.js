@@ -49,7 +49,11 @@ const QUESTIONS = [
     correct:{Sweden:"2", Rwanda:"4"},
     activeGroups:{
       Rwa1:"Sweden",
-      Swe1:"Rwanda"
+      Rwa2:"Sweden",
+      Rwa3: "Sweden",
+      Swe1:"Rwanda",
+      Swe2: "Rwanda",
+      Swe3: "Rwanda"
     }
   },
   {
@@ -60,27 +64,34 @@ const QUESTIONS = [
     correct:{Sweden:"6–7 PM", Rwanda:"8–9 PM"},
     activeGroups:{
       Rwa1:"Sweden",
-      Swe1:"Rwanda"
+      Rwa2:"Sweden",
+      Rwa3: "Sweden",
+      Swe1:"Rwanda",
+      Swe2: "Rwanda",
+      Swe3: "Rwanda"
     }
   },
   {
     id:"q3",
-    type:"single",
-    title:"How many national upper-secondary programmes does Sweden have?",
-    options:["8","12","15","18","21","24"],
-    correct:{Sweden:"18"},
+    type:"countryGuess",
+    title:"How many percent of households own a computer?",
+    options:["4%","17%","31%","68%","87%","93%"],
+    correct:{Sweden:"93%", Rwanda:"4%"},
     activeGroups:{
-      Rwa1: "Rwanda",
-      Rwa2:"Rwanda",
-      Rwa3: "Rwanda"
+      Rwa1:"Sweden",
+      Rwa2:"Sweden",
+      Rwa3: "Sweden",
+      Swe1:"Rwanda",
+      Swe2: "Rwanda",
+      Swe3: "Rwanda"
     }
   },
   {
     id:"q4",
     type:"single",
-    title:"What percentage of Rwandan households owned a mobile phone in 2024?",
-    options:["35%","50%","65%","75%","85%","95%"],
-    correct:{Rwanda:"85%"},
+    title:"Which of the following items is restricted in Rwanda?",
+    options:["Water bottles","Umbrellas","Coffee","Plastic bags","Sugar","Paper"],
+    correct:{Rwanda:"Plastic bags"},
     activeGroups:{
       Swe1:"Sweden",
       Swe2:"Sweden",
@@ -89,9 +100,51 @@ const QUESTIONS = [
   },
   {
     id:"q5",
+    type:"single",
+    title:"What is Systembolaget",
+    options:["Swedens national railway","The only chain allowed to sell alcohol in Sweden","Sweden's largest supermarket chain","Swedens national bank","The surname of the Swedish royal family","The capital"],
+    correct:{Sweden:"The only chain allowed to sell alcohol in Sweden"},
+    activeGroups:{
+      Rwa1:"Rwanda",
+      Rwa2:"Rwanda",
+      Rwa3:"Rwanda"
+    }
+  },
+  {
+    id:"q6",
+    type:"single",
+    title:"What is Umuganda",
+    options:["Independence day celebration","Monthly community work day","Big cultural festival","Payday","The national exams for high school students","A type of fruit traditionally eaten for breakfast"],
+    correct:{Rwanda:"Monthly community work day"},
+    activeGroups:{
+      Swe1:"Sweden",
+      Swe2:"Sweden",
+      Swe3:"Sweden"
+    }
+  },
+  {
+    id:"q7",
+    type:"single",
+    title:"Which of the following is not a Swedish tradition",
+    options:["Fika: A short break where you drink coffee and sometimes eat a cookie","Lördagsgodis: Saturday candy, only day when children are allowed to eat candy","Fredagsmys: Family stay at home on a Friday to relax and spend time with eachother, usually eating taco","Midsommar: A celebration of summer where people jump around a pole like frogs","Mittiveckan: A weekly tradition of eating seafood with friends","Valborg: A night where big bonfires are light to protect against bad spirits and students party"],
+    correct:{Sweden:"Mittiveckan: A weekly tradition of eating seafood with friends"},
+    activeGroups:{
+      Rwa1:"Rwanda",
+      Rwa2:"Rwanda",
+      Rwa3:"Rwanda"
+    }
+  },
+  {
+    id:"q8",
     type:"cultural",
     title:"If you and a friend have decided to meet up at 18:01, when would you be there?",
     options:["before 17:30","17:30-18:00","18:00 - 18:15","18:15-18:30","18:30 - 19:00","after 19:00"]
+  },
+  {
+    id:"q9",
+    type:"cultural",
+    title:"How many would you consider a normal amount of people to be at a wedding?",
+    options:["Less than 40","40-60","60-150","150-300","300-500","600+"]
   }
 ];
 
